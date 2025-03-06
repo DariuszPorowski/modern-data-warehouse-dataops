@@ -33,8 +33,8 @@ if __name__ == "__main__":
         template_id = create_template(conn, cursor, name)
         print(f"Created template {name} with id: {template_id}")
         print("Writing to lockfile.")
-        output_path = create_template_question_lockfile(cursor=cursor, template_id=template_id)
-        print(f"Updated template question lockfile at path {output_path}")
+        # output_path = create_template_question_lockfile(cursor=cursor, template_id=template_id)
+        # print(f"Updated template question lockfile at path {output_path}")
     finally:
         cursor.close()
         conn.close()
