@@ -329,6 +329,7 @@ sp_stor_out=$(az ad sp create-for-rbac \
     --name "$sp_stor_name" \
     --output json)
 
+
 # store storage service principal details in Keyvault
 sp_stor_id=$(echo "$sp_stor_out" | jq -r '.appId')
 sp_stor_pass=$(echo "$sp_stor_out" | jq -r '.password')
@@ -367,13 +368,14 @@ az keyvault secret set --vault-name "$kv_name" --name "databricksWorkspaceResour
 # Configure databricks (KeyVault-backed Secret scope, mount to storage via SP, databricks tables, cluster)
 # NOTE: must use Microsoft Entra access token, not PAT token
 DATABRICKS_TOKEN=$databricks_aad_token \
-    DATABRICKS_HOST=$databricks_host \
-    KEYVAULT_DNS_NAME=$kv_dns_name \
-    USER_NAME=$kv_owner_name \
-    AZURE_LOCATION=$AZURE_LOCATION \
-    KEYVAULT_RESOURCE_ID=$(echo "$arm_output" | jq -r '.properties.outputs.keyvault_resource_id.value') \
-    STORAGE_CONN_STRING=$(echo "$arm_output" | jq -r '.properties.outputs.storage_conn_string.value') \
+DATABRICKS_HOST=$databricks_host \
+KEYVAULT_DNS_NAME=$kv_dns_name \
+USER_NAME=$kv_owner_name \
+AZURE_LOCATION=$AZURE_LOCATION \
+KEYVAULT_RESOURCE_ID=$(echo "$arm_output" | jq -r '.properties.outputs.keyvault_resource_id.value') \
+STORAGE_CONN_STRING=$(echo "$arm_output" | jq -r '.properties.outputs.storage_conn_string.value') \
     bash -c "./infrastructure/configure_databricks.sh"
+# TODO: generate and add the full sql connection string later
 
 ####################
 # AZDO Azure Service Connection and Variables Groups
