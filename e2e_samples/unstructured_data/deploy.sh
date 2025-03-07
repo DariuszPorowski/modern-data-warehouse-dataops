@@ -245,6 +245,7 @@ az keyvault secret set --vault-name "$kv_name" --name "datalakeKey" --value "$az
 az keyvault secret set --vault-name "$kv_name" --name "datalakeurl" --value "https://$azure_storage_account.dfs.core.windows.net" -o none
 
 ### CLONE EXCITATION REPO####
+# Note: Should ensure excitation doesn't already exist or else this will fail
 git clone https://github.com/billba/excitation
 
 ###WEBAPP DEPLOYMENT####
@@ -316,29 +317,6 @@ az keyvault secret set --vault-name "$kv_name" --name "applicationInsightsConnec
 
 # Note: SP is required because Credential Passthrough does not support ADF (MSI) as of July 2021
 log "Creating Service Principal (SP) for access to ADLS Gen2 used in Databricks mounting"
-
-stor_id=$(az storage account show \
-    --name "$azure_storage_account" \
-    --resource-group "$resource_group_name" \
-    --output json |
-    jq -r '.id')
-sp_stor_name="${PROJECT}-stor-${ENV_NAME}-${DEPLOYMENT_ID}-sp"
-sp_stor_out=$(az ad sp create-for-rbac \
-    --role "Storage Blob Data Contributor" \
-    --scopes "$stor_id" \
-    --name "$sp_stor_name" \
-    --output json)
-
-
-# store storage service principal details in Keyvault
-sp_stor_id=$(echo "$sp_stor_out" | jq -r '.appId')
-sp_stor_pass=$(echo "$sp_stor_out" | jq -r '.password')
-sp_stor_tenant=$(echo "$sp_stor_out" | jq -r '.tenant')
-
-az keyvault secret set --vault-name "$kv_name" --name "spStorName" --value "$sp_stor_name" -o none
-az keyvault secret set --vault-name "$kv_name" --name "spStorId" --value "$sp_stor_id" -o none
-az keyvault secret set --vault-name "$kv_name" --name "spStorPass" --value="$sp_stor_pass" -o none ##=handles hyphen passwords
-az keyvault secret set --vault-name "$kv_name" --name "spStorTenantId" --value "$sp_stor_tenant" -o none
 
 log "Generate Databricks token"
 databricks_host=https://$(echo "$arm_output" | jq -r '.properties.outputs.databricks_output.value.properties.workspaceUrl')
