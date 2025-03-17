@@ -2,9 +2,9 @@
 
 Microsoft Fabric is an end-to-end analytics and data platform designed for enterprises that require a unified solution. It encompasses data movement, processing, ingestion, transformation, real-time event routing, and report building. Operating on a Software as a Service (SaaS) model, Fabric brings simplicity and integration to data and analytics solutions.
 
-However, this simplification comes with a cost. The SaaS nature of Fabric makes the DataOps process more complex. Customer needs to learn new ways of deploying, testing, and handling workspace artifacts. The CI/CD process for Fabric workspaces also differs from traditional CI/CD pipelines. For example, using Fabric deployment pipelines for promoting artifacts across environments is a unique feature of Fabric, and doesn't have a direct equivalent in other CI/CD tools.
+However, this simplification comes with a cost. The SaaS nature of Fabric makes the DataOps process more complex. Developers/Engineers need to learn new ways of deploying, testing, and handling workspace artifacts. The CI/CD process for Fabric workspaces also differs from traditional CI/CD pipelines. For example, using Fabric deployment pipelines for promoting artifacts across environments is a unique feature of Fabric, and doesn't have a direct equivalent in other CI/CD tools.
 
-This sample aims to provide customers with a reference end-to-end (E2E) implementation of DataOps on Microsoft Fabric, covering non-functional aspects such as observability, security, data quality, and testing. It is designed as a reference implementation and should be customized to meet specific customer requirements.
+This sample aims to provide users with a reference end-to-end (E2E) implementation of DataOps on Microsoft Fabric, covering non-functional aspects such as observability, security, data quality, and testing. It is designed as a reference implementation and should be customized to meet specific requirements.
 
 ## Contents <!-- omit in toc -->
 
@@ -53,10 +53,12 @@ The diagram below illustrates the complete end-to-end CI/CD process:
 
 Here is a high-level summary of the steps involved:
 
+- Clone this repository and update the `.env` file with the required environment variables.
 - Deploy the sample infrastructure which creates three environments (dev, staging, prod) by default with Azure and Fabric resources.
 - Create a new feature workspace using the [branch out to a new workspace](https://learn.microsoft.com/fabric/cicd/git-integration/manage-branches?tabs=azure-devops#scenario-2---develop-using-another-workspace) functionality. Develop and test the feature in the feature workspace.
 - Open a pull request (PR) to merge the feature branch into the `dev` branch.
 - The QA pipeline it triggered automatically when a PR is opened. The pipeline runs Python unit tests and Fabric unit tests to validate the changes.
+  - This pipeline creates an ephemeral workspace to test the changes in isolation before merging into the `dev` workspace.
 - Once the PR is approved and merged, the build artifacts pipeline is triggered. This pipeline publishes configuration files and custom libraries as artifacts.
 - The release pipeline is triggered once the build artifacts pipeline completes successfully. This pipeline uploads the config changes to the ADLS Gen2 storage account and deploys the Fabric items to the dev environment using Fabric Git sync and REST APIs.
 - The same process is followed for the staging and production environments: a new PR is opened to merge changes from the `dev` branch to the `stg` branch, triggering the release pipeline to deploy to staging. This process is then repeated for the production environment.

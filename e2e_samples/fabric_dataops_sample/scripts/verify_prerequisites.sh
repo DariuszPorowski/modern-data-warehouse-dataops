@@ -84,7 +84,7 @@ check_env_vars() {
     exit 1
   fi
 
-  COMPULSORY_VARS=("TENANT_ID" "SUBSCRIPTION_ID" "BASE_NAME" "FABRIC_WORKSPACE_ADMIN_SG_NAME" "FABRIC_CAPACITY_ADMINS")
+  COMPULSORY_VARS=("TENANT_ID" "SUBSCRIPTION_ID" "ENVIRONMENT_NAMES" "RESOURCE_GROUP_NAMES" "BASE_NAME" "FABRIC_WORKSPACE_ADMIN_SG_NAME")
   local missing_compulsory_vars=()
 
   for var in "${COMPULSORY_VARS[@]}"; do
@@ -111,6 +111,12 @@ check_env_vars() {
   # Ensure 'ENVIRONMENT_NAMES' and 'GIT_BRANCH_NAMES' arrays have the same length
   if [ ${#ENVIRONMENT_NAMES[@]} -ne ${#GIT_BRANCH_NAMES[@]} ]; then
     echo "[Error] ENVIRONMENT_NAMES and GIT_BRANCH_NAMES arrays must have the same length."
+    exit 1
+  fi
+
+  # If creating a new capacity, i.e., EXISTING_FABRIC_CAPACITY_NAME is not set, FABRIC_CAPACITY_ADMINS must be set
+  if [[ -z "$EXISTING_FABRIC_CAPACITY_NAME" && -z "$FABRIC_CAPACITY_ADMINS" ]]; then
+    echo "Error: FABRIC_CAPACITY_ADMINS cannot be empty when EXISTING_FABRIC_CAPACITY_NAME is not set."
     exit 1
   fi
 

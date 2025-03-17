@@ -13,6 +13,7 @@ The [frequently asked questions (FAQs)](#frequently-asked-questions) section add
   - [The lakehouse is empty after branch-out](#the-lakehouse-is-empty-after-branch-out)
   - [The default lakehouse attached to notebooks is incorrect after branch-out](#the-default-lakehouse-attached-to-notebooks-is-incorrect-after-branch-out)
   - [Fabric spark custom pool settings are not synced during branch-out](#fabric-spark-custom-pool-settings-are-not-synced-during-branch-out)
+  - [Access token expiration during environment publish](#access-token-expiration-during-environment-publish)
 - [Limitations](#limitations)
   - [Fabric REST APIs limitations](#fabric-rest-apis-limitations)
   - [Fabric Environment does not recognize change in custom libraries with same file name](#fabric-environment-does-not-recognize-change-in-custom-libraries-with-same-file-name)
@@ -110,6 +111,16 @@ The sample deploys a custom spark pool and configures the spark workspace settin
 In some cases, it might be acceptable to use different pool settings or default values in the feature workspace. In such case, it can be left to the developer to update the pool and workspace spark settings as needed. As these settings are not Git synced, they will not be part of the pull request and will not affect the development workspace.
 
 Otherwise, these update can be applied as part of the post-processing step mentioned above. This post processing step can read the settings of the dev workspace and apply the same to the feature workspace using the [Fabric REST APIs](https://learn.microsoft.com/rest/api/fabric/spark/workspace-settings/update-spark-settings?tabs=HTTP).
+
+### Access token expiration during environment publish
+
+During deployment, the script updates the Fabric environment by making a call to the Fabric REST API. Since the environment publishing process takes approximately 10 minutes, this call may fail due to an expired access token, as shown below:
+
+![Access token expiration error message](./../images/token-expiration-error.png)
+
+#### Workaround <!-- omit in toc -->
+
+This is an intermittent issue and can be resolved by re-running the deployment script.
 
 ## Limitations
 

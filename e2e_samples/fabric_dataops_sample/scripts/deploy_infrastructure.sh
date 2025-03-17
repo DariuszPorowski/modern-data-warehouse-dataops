@@ -331,7 +331,7 @@ EOF
   fi
 }
 
-echo "[Info] ############ STARTING INFRA DEPLOYMENT ############"
+echo "[Info] ############ STARTING INFRA DEPLOYMENT FOR '$environment_name' ############"
 echo "[Info] ############ Deploying terraform resources ############"
 user_principal_type=$(az account show --query user.type -o tsv)
 
@@ -398,4 +398,4 @@ else
   echo "[Info] The Fabric environment is not created in higher environments, thus skipping package upload."
 fi
 
-echo "[Info] ############ FINISHED INFRA DEPLOYMENT ############"
+echo "[Info] ############ FINISHED INFRA DEPLOYMENT FOR '$environment_name' ############"

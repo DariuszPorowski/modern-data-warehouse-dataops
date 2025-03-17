@@ -82,14 +82,6 @@ module "storage_blob_contributor_assignment_002" {
   scope                = module.adls.storage_account_id
 }
 
-module "fabric_workspace_role_assignment" {
-  source         = "./modules/fabric/workspace_role_assignment"
-  workspace_id   = module.fabric_workspace.workspace_id
-  principal_id   = data.azuread_group.fabric_workspace_admin.object_id
-  principal_type = "Group"
-  role           = "Admin"
-}
-
 module "fabric_lakehouse" {
   enable                = var.deploy_fabric_items
   source                = "./modules/fabric/lakehouse"
@@ -127,6 +119,20 @@ module "fabric_spark_workspace_settings" {
   workspace_id      = module.fabric_workspace.workspace_id
   runtime_version   = module.fabric_spark_environment_settings.spark_environment_settings_runtime_version
   default_pool_name = module.fabric_spark_custom_pool.spark_custom_pool_name
+}
+
+# To avoid the missing lakehouse/environment issue, adding hard dependencies to the role assignment module.
+# See https://tinyurl.com/missing-lakehouse-environment for more details.
+module "fabric_workspace_role_assignment" {
+  source         = "./modules/fabric/workspace_role_assignment"
+  workspace_id   = module.fabric_workspace.workspace_id
+  principal_id   = data.azuread_group.fabric_workspace_admin.object_id
+  principal_type = "Group"
+  role           = "Admin"
+  depends_on = [
+    module.fabric_lakehouse,
+    module.fabric_spark_workspace_settings
+  ]
 }
 
 module "fabric_setup_notebook" {
